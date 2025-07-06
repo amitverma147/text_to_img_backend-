@@ -131,7 +131,39 @@ const userCredits = async (req, res) => {
   try {
     const { userId } = req.body;
     
-  } catch (error) {}
+    // Validate userId
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    // Find user and check if exists
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Return user credits
+    res.status(200).json({
+      success: true,
+      credits: user.creditBalance || 0,
+      user: {
+        id: user._id,
+        name: user.name,
+      },
+    });
+  } catch (error) {
+    console.error("User credits error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };
 
-export { registerUser, loginUser };
+export { registerUser, loginUser, userCredits };
