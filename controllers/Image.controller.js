@@ -4,16 +4,20 @@ import axios from "axios";
 
 export const generateImage = async (req, res) => {
   try {
-    const { userId, prompt } = req.body;
-    const user = await userModel.findById({ userId });
+    const {prompt } = req.body;
+    const {userId} = req.user;
+    const user = await userModel.findById(userId);
+    console.log(userId, prompt, user);
+
     if (!user || !prompt) {
       return res.json({ success: false, message: "Missing Details" });
     }
+
     if (user.crediBalance === 0 || userModel.crediBalance < 0) {
       return res.json({
         success: false,
         message: "No Credit Balance",
-        crediBalance: user.crediBalance,
+        crediBalance: user.creditBalance,
       });
     }
 
@@ -33,12 +37,12 @@ export const generateImage = async (req, res) => {
     const base64Image = Buffer.from(data, "binary").toString("base64");
     const resultImage = `data:image/png;base64,${base64Image}`;
     await userModel.findByIdAndUpdate(user._id, {
-      crediBalance: user.crediBalance - 1,
+      creditBalance: user.creditBalance - 1,
     });
     res.json({
       success: true,
       message: "Image Generated",
-      crediBalance: user.crediBalance - 1,
+      creditBalance: user.creditBalance - 1,
       resultImage,
     });
   } catch (error) {
