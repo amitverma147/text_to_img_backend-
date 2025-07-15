@@ -14,7 +14,7 @@ await connectDB();
 app.use("/api/user", userRouter);
 app.use("/api/image", imageRouter);
 
-app.get("/", (req, res) => {
+app.get("/test", (req, res) => {
   return res.send("API WORKING");
 });
 
